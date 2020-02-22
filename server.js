@@ -92,7 +92,10 @@ let colors = [
 let nextId = 12;
 
 function authenticator(req, res, next) {
+  console.log('req.headers', req.headers)
   const { authorization } = req.headers;
+  console.log('authorization', authorization)
+  console.log('token', token)
   if (authorization === token) {
     next();
   } else {
@@ -154,7 +157,7 @@ app.delete("/api/colors/:id", authenticator, (req, res) => {
   res.status(202).send(req.params.id);
 });
 
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
   res.send("App is working 👍");
 });
 

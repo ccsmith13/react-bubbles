@@ -6,7 +6,9 @@ const initialColor = {
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors }) => {
+
+
+const ColorList = ({ colors, updateColors }, props) => {
   console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
@@ -16,26 +18,53 @@ const ColorList = ({ colors, updateColors }) => {
     setColorToEdit(color);
   };
 
+
   const saveEdit = e => {
-    e.preventDefault();
+    //e.preventDefault();
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is it saved right now?
+
+
+    let token = localStorage.getItem("token");
+    console.log('token', token);
+
+    let headers = {
+      headers: {
+        authorization: token
+      }
+    }
+
     axios
-      .put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit)
+      .put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit, headers)
       .then(res => {
-        console.log('res  in handleSubmit', res
-        )
-        //updateColors(res.data);
+        console.log('res  in handleSubmit', res);
+        props.history.push("/bubble-page");
       })
       .catch(err => {
         console.log(err);
       });
   };
 
+
   const deleteColor = color => {
     // make a delete request to delete this color
-  };
+    let token = localStorage.getItem("token");
+    let headers = {
+      headers: {
+        authorization: token
+      }
+    }
+    axios
+      .delete(`http://localhost:5000/api/colors/${color.id}`, headers)
+      .then(res => {
+        this.props.updateColors(res.data);
+        this.props.history.push("/bubble-page");
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
 
   return (
     <div className="colors-wrap">
