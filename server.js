@@ -92,10 +92,10 @@ let colors = [
 let nextId = 12;
 
 function authenticator(req, res, next) {
-  console.log('req.headers', req.headers)
+  //console.log('req.headers', req.headers)
   const { authorization } = req.headers;
-  console.log('authorization', authorization)
-  console.log('token', token)
+  //console.log('authorization', authorization)
+  //console.log('token', token)
   if (authorization === token) {
     next();
   } else {
