@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { red } from "color-name";
 
 const initialColor = {
   color: "",
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors }) => {
+const ColorList = ({ colors, updateColors }, props) => {
   console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
@@ -16,16 +17,55 @@ const ColorList = ({ colors, updateColors }) => {
     setColorToEdit(color);
   };
 
+
   const saveEdit = e => {
+
     e.preventDefault();
-    // Make a put request to save your updated color
-    // think about where will you get the id from...
-    // where is is saved right now?
+
+    let token = localStorage.getItem("token");
+    console.log('token', token);
+
+    let headers = {
+      headers: {
+        authorization: token
+      }
+    }
+
+    axios
+      .put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit, headers)
+      .then(res => {
+        //console.log('res  in handleSubmit', res);
+        var elementPos = colors.map(function (x) { return x.id; }).indexOf(colorToEdit.id);
+        let newColorsList = colors.slice();
+        newColorsList[elementPos] = res.data;
+        updateColors(newColorsList)
+      })
+      .catch(err => {
+        console.log(err);
+      });
   };
 
+
   const deleteColor = color => {
-    // make a delete request to delete this color
-  };
+    let token = localStorage.getItem("token");
+    let headers = {
+      headers: {
+        authorization: token
+      }
+    }
+    axios
+      .delete(`http://localhost:5000/api/colors/${color.id}`, headers)
+      .then(res => {
+        //console.log('res', res)
+        var elementPos = colors.map(function (x) { return x.id; }).indexOf(res.data);
+        let removed = colors.splice(elementPos, 1)
+        let newColors = colors.slice()
+        updateColors(newColors)
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
 
   return (
     <div className="colors-wrap">
@@ -35,11 +75,11 @@ const ColorList = ({ colors, updateColors }) => {
           <li key={color.color} onClick={() => editColor(color)}>
             <span>
               <span className="delete" onClick={e => {
-                    e.stopPropagation();
-                    deleteColor(color)
-                  }
-                }>
-                  x
+                e.stopPropagation();
+                deleteColor(color)
+              }
+              }>
+                x
               </span>{" "}
               {color.color}
             </span>
